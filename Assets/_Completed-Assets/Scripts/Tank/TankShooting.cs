@@ -7,6 +7,7 @@ namespace Complete
     public class TankShooting : MonoBehaviourPunCallbacks
 
     {
+        public Transform m_Turret;
         
         public int m_PlayerNumber = 1;              // Used to identify the different players.
         public Rigidbody m_Shell;                   // Prefab of the shell.
@@ -84,27 +85,43 @@ namespace Complete
                 Fire ();
             }
         }
-
+        private void Rotate()
+        {
+            
+        }
 
         private void Fire ()
         {
             // Set the fired flag so only Fire is only called once.
             m_Fired = true;
-            GameObject shellInstance = PhotonNetwork.Instantiate("CompleteShell",m_FireTransform.position,m_FireTransform.rotation,0);
-            
-
+            Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
             // Create an instance of the shell and store a reference to it's rigidbody.
-            Rigidbody body = shellInstance.GetComponent<Rigidbody>();
+            float power = m_CurrentLaunchForce;
+            photonView.RPC("FireOther", RpcTarget.Others, m_FireTransform.position,m_CurrentLaunchForce,power);
+
 
             // Set the shell's velocity to the launch force in the fire position's forward direction.
-            body.velocity = m_CurrentLaunchForce * m_FireTransform.forward; 
+            shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward; 
 
             // Change the clip to the firing clip and play it.
             m_ShootingAudio.clip = m_FireClip;
             m_ShootingAudio.Play ();
+             Debug.Log(m_CurrentLaunchForce);
 
             // Reset the launch force.  This is a precaution in case of missing button events.
             m_CurrentLaunchForce = m_MinLaunchForce;
+           
+        }
+        [PunRPC]
+        private void FireOther(Vector3 pos,float power)
+        {
+            m_Fired = true;
+            Rigidbody shellInstance = Instantiate(m_Shell,pos,m_FireTransform.rotation)as Rigidbody;
+            m_CurrentLaunchForce = power;
+            shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
+            Debug.Log(m_CurrentLaunchForce);
+            m_CurrentLaunchForce = m_MinLaunchForce;
+            
         }
     }
 }
