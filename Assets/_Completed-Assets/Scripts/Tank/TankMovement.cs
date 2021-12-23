@@ -19,6 +19,10 @@ namespace Complete
         private float m_TurnInputValue;             // The current value of the turn input.
         private float m_OriginalPitch;              // The pitch of the audio source at the start of the scene.
         private ParticleSystem[] m_particleSystems; // References to all the particles systems used by the Tanks
+        public GameObject Turret;
+        public float TurnTurretSpeed = 100f;
+        private string TurnTurretName;
+        private float TurnTurretValue;
 
         private void Awake ()
         {
@@ -64,6 +68,7 @@ namespace Complete
             // The axes names are based on player number.
             m_MovementAxisName = "Vertical" ;
             m_TurnAxisName = "Horizontal" ;
+            TurnTurretName="TurnTurret";
 
             // Store the original pitch of the audio source.
             m_OriginalPitch = m_MovementAudio.pitch;
@@ -75,9 +80,11 @@ namespace Complete
             // Store the value of both input axes.
             m_MovementInputValue = Input.GetAxis (m_MovementAxisName);
             m_TurnInputValue = Input.GetAxis (m_TurnAxisName);
+            TurnTurretValue = Input.GetAxis (TurnTurretName);
 
             EngineAudio ();
         }
+        
 
 
         private void EngineAudio ()
@@ -113,6 +120,7 @@ namespace Complete
             // Adjust the rigidbodies position and orientation in FixedUpdate.
             Move ();
             Turn ();
+            TurnTurret();
         }
 
 
@@ -136,6 +144,11 @@ namespace Complete
 
             // Apply this rotation to the rigidbody's rotation.
             m_Rigidbody.MoveRotation (m_Rigidbody.rotation * turnRotation);
+        }
+        private void TurnTurret ()
+        {
+            float Turn = TurnTurretValue * TurnTurretSpeed * Time.deltaTime;
+            Turret.transform.Rotate(0,Turn,0);
         }
     }
 }

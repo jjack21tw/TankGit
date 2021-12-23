@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 
@@ -7,7 +7,7 @@ namespace Complete
     public class TankShooting : MonoBehaviourPunCallbacks
 
     {
-        public Transform m_Turret;
+        
         
         public int m_PlayerNumber = 1;              // Used to identify the different players.
         public Rigidbody m_Shell;                   // Prefab of the shell.
